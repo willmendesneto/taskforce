@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  # Next.js application
+  app:
+    build:
+      context: .
+      target: development
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    ports:
+      - '3000:3000'
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/taskflow
+      - NEXTAUTH_URL=http://localhost:3000
+      - NEXTAUTH_SECRET=your-nextauth-secret-key
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+    depends_on:
+      - db
+    restart: unless-stopped
+    # Enable hot reloading
+    stdin_open: true
+    tty: true
+    networks:
+      - local-network
+
+  # PostgreSQL database
+  db:
+    image: postgres:14-alpine
+    volumes:
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=taskflow
+    ports:
+      - '5432:5432'
+    restart: unless-stopped
+    networks:
+      - local-network
+
+volumes:
+  postgres_data:
+
+networks:
+  local-network:

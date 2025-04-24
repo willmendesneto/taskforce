@@ -1,0 +1,9 @@
+{
+  "files": [
+    {
+      "path": ".next/static/chunks/main-app-*.js",
+      "maxSize": "300B"
+    }
+  ],
+  "compression": "gzip"
+}
